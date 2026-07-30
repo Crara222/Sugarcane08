@@ -5,10 +5,8 @@ const CATEGORIES = [
   { name: "분식", emoji: "🍢" },
   { name: "미식", emoji: "🍽️" },
   { name: "아시안", emoji: "🍜" },
-  { name: "양식", emoji: "🍝", recommended: true },
-  { name: "패스트푸드", emoji: "🍟", recommended: true },
-  { name: "채식", emoji: "🥗", recommended: true },
-  { name: "디저트/카페", emoji: "🍰", recommended: true },
+  { name: "양식", emoji: "🍝" },
+  { name: "패스트푸드", emoji: "🍟" },
 ];
 
 const SPIN_TICKS = 18;
