@@ -87,6 +87,10 @@ body {
   gap: 6px;
 }
 
+.recommend-situations {
+  margin-bottom: 14px;
+}
+
 .outfit-result {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
