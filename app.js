@@ -3,16 +3,18 @@
 
   var ITEMS_KEY = "coordi.items.v1";
   var FAVORITES_KEY = "coordi.favorites.v1";
+  var DISLIKED_KEY = "coordi.disliked.v1";
 
   var CATEGORIES = ["상의", "하의", "아우터", "신발", "액세서리"];
   var REQUIRED_CATEGORIES = ["상의", "하의", "신발"];
   var OPTIONAL_CATEGORIES = ["아우터", "액세서리"];
+  var MAX_DISLIKE_RETRIES = 30;
 
   var state = {
     items: loadJSON(ITEMS_KEY, []),
     favorites: loadJSON(FAVORITES_KEY, []),
+    dislikedCombos: loadJSON(DISLIKED_KEY, []),
     currentOutfit: null, // { 상의: item|null, 하의: item|null, ... }
-    currentFit: "레귤러",
     selectedSeason: getCurrentSeason()
   };
 
@@ -22,16 +24,16 @@
     itemName: document.getElementById("itemName"),
     itemColor: document.getElementById("itemColor"),
     itemSeasons: document.getElementById("itemSeasons"),
-    itemFit: document.getElementById("itemFit"),
-    itemGenre: document.getElementById("itemGenre"),
-    itemMemo: document.getElementById("itemMemo"),
+    itemSituations: document.getElementById("itemSituations"),
     closetList: document.getElementById("closetList"),
     seasonFilter: document.getElementById("seasonFilter"),
+    situationFilter: document.getElementById("situationFilter"),
     includeOuter: document.getElementById("includeOuter"),
     includeAccessory: document.getElementById("includeAccessory"),
     outfitResult: document.getElementById("outfitResult"),
     recommendBtn: document.getElementById("recommendBtn"),
     saveFavoriteBtn: document.getElementById("saveFavoriteBtn"),
+    dislikeOutfitBtn: document.getElementById("dislikeOutfitBtn"),
     favoriteList: document.getElementById("favoriteList")
   };
 
@@ -50,6 +52,10 @@
 
   function saveFavorites() {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(state.favorites));
+  }
+
+  function saveDisliked() {
+    localStorage.setItem(DISLIKED_KEY, JSON.stringify(state.dislikedCombos));
   }
 
   function makeId() {
@@ -77,6 +83,26 @@
     });
   }
 
+  function getCheckedValues(container) {
+    var values = [];
+    container.querySelectorAll("input[type=checkbox]:checked").forEach(function (box) {
+      values.push(box.value);
+    });
+    return values;
+  }
+
+  // items with no situation tags are treated as all-purpose and match any filter
+  function itemsForRecommend(category) {
+    var items = itemsForSeason(category);
+    var selectedSituations = getCheckedValues(els.situationFilter);
+    if (selectedSituations.length === 0) return items;
+    return items.filter(function (it) {
+      return !it.situations || it.situations.length === 0 || it.situations.some(function (s) {
+        return selectedSituations.indexOf(s) !== -1;
+      });
+    });
+  }
+
   function setSeasonFilter(value) {
     state.selectedSeason = value;
     els.seasonFilter.querySelectorAll(".segmented-btn").forEach(function (btn) {
@@ -94,33 +120,16 @@
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
 
-  function getCheckedSeasons() {
-    var boxes = els.itemSeasons.querySelectorAll("input[type=checkbox]");
-    var seasons = [];
-    boxes.forEach(function (box) {
-      if (box.checked) seasons.push(box.value);
-    });
-    return seasons;
-  }
-
-  function resetSeasonCheckboxes() {
-    els.itemSeasons.querySelectorAll("input[type=checkbox]").forEach(function (box) {
+  function resetCheckboxes(container) {
+    container.querySelectorAll("input[type=checkbox]").forEach(function (box) {
       box.checked = false;
-    });
-  }
-
-  function setFit(value) {
-    state.currentFit = value;
-    els.itemFit.querySelectorAll(".segmented-btn").forEach(function (btn) {
-      btn.classList.toggle("active", btn.dataset.value === value);
     });
   }
 
   function buildTags(it) {
     var tags = [];
     if (it.seasons && it.seasons.length > 0) tags = tags.concat(it.seasons);
-    if (it.fit) tags.push(it.fit);
-    if (it.genre) tags.push(it.genre);
+    if (it.situations && it.situations.length > 0) tags = tags.concat(it.situations);
     return tags;
   }
 
@@ -227,9 +236,33 @@
 
   // --- recommend ---
 
+  function outfitComboKey(outfit) {
+    return CATEGORIES
+      .map(function (cat) { return outfit[cat] ? outfit[cat].id : null; })
+      .filter(Boolean)
+      .sort()
+      .join(",");
+  }
+
+  function isDislikedCombo(outfit) {
+    var key = outfitComboKey(outfit);
+    return state.dislikedCombos.indexOf(key) !== -1;
+  }
+
+  function buildRandomOutfit() {
+    var outfit = {};
+    REQUIRED_CATEGORIES.forEach(function (cat) {
+      outfit[cat] = pickRandom(itemsForRecommend(cat));
+    });
+
+    outfit["아우터"] = els.includeOuter.checked ? pickRandom(itemsForRecommend("아우터")) : null;
+    outfit["액세서리"] = els.includeAccessory.checked ? pickRandom(itemsForRecommend("액세서리")) : null;
+    return outfit;
+  }
+
   function generateOutfit() {
     var missingRequired = REQUIRED_CATEGORIES.filter(function (cat) {
-      return itemsForSeason(cat).length === 0;
+      return itemsForRecommend(cat).length === 0;
     });
 
     if (missingRequired.length > 0) {
@@ -242,13 +275,12 @@
       return;
     }
 
-    var outfit = {};
-    REQUIRED_CATEGORIES.forEach(function (cat) {
-      outfit[cat] = pickRandom(itemsForSeason(cat));
-    });
-
-    outfit["아우터"] = els.includeOuter.checked ? pickRandom(itemsForSeason("아우터")) : null;
-    outfit["액세서리"] = els.includeAccessory.checked ? pickRandom(itemsForSeason("액세서리")) : null;
+    var outfit = buildRandomOutfit();
+    var attempts = 0;
+    while (isDislikedCombo(outfit) && attempts < MAX_DISLIKE_RETRIES) {
+      outfit = buildRandomOutfit();
+      attempts += 1;
+    }
 
     state.currentOutfit = outfit;
     renderOutfit();
@@ -263,6 +295,7 @@
       p.textContent = message || "상의·하의·신발을 옷장에 먼저 등록해주세요.";
       els.outfitResult.appendChild(p);
       els.saveFavoriteBtn.disabled = true;
+      els.dislikeOutfitBtn.disabled = true;
       return;
     }
 
@@ -302,6 +335,19 @@
     });
 
     els.saveFavoriteBtn.disabled = false;
+    els.dislikeOutfitBtn.disabled = false;
+  }
+
+  function dislikeOutfit() {
+    if (!state.currentOutfit) return;
+
+    var key = outfitComboKey(state.currentOutfit);
+    if (key && state.dislikedCombos.indexOf(key) === -1) {
+      state.dislikedCombos.push(key);
+      saveDisliked();
+    }
+
+    generateOutfit();
   }
 
   // --- favorites ---
@@ -393,23 +439,16 @@
       category: els.itemCategory.value,
       name: name,
       color: els.itemColor.value.trim(),
-      seasons: getCheckedSeasons(),
-      fit: state.currentFit,
-      genre: els.itemGenre.value,
-      memo: els.itemMemo.value.trim(),
+      seasons: getCheckedValues(els.itemSeasons),
+      situations: getCheckedValues(els.itemSituations),
       createdAt: Date.now()
     });
 
     els.itemName.value = "";
     els.itemColor.value = "";
-    els.itemMemo.value = "";
-    resetSeasonCheckboxes();
-    setFit("레귤러");
+    resetCheckboxes(els.itemSeasons);
+    resetCheckboxes(els.itemSituations);
     els.itemName.focus();
-  });
-
-  els.itemFit.querySelectorAll(".segmented-btn").forEach(function (btn) {
-    btn.addEventListener("click", function () { setFit(btn.dataset.value); });
   });
 
   els.seasonFilter.querySelectorAll(".segmented-btn").forEach(function (btn) {
@@ -419,11 +458,17 @@
     });
   });
 
+  els.situationFilter.querySelectorAll("input[type=checkbox]").forEach(function (box) {
+    box.addEventListener("change", function () {
+      if (state.currentOutfit) generateOutfit();
+    });
+  });
+
   els.recommendBtn.addEventListener("click", generateOutfit);
   els.saveFavoriteBtn.addEventListener("click", saveFavorite);
+  els.dislikeOutfitBtn.addEventListener("click", dislikeOutfit);
 
   // --- init ---
-  setFit(state.currentFit);
   setSeasonFilter(state.selectedSeason);
   renderCloset();
   renderOutfit();

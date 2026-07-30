@@ -26,12 +26,19 @@
       <label><input type="checkbox" id="includeOuter" checked> 아우터 포함</label>
       <label><input type="checkbox" id="includeAccessory" checked> 액세서리 포함</label>
     </div>
+    <label class="field-label">상황</label>
+    <div class="checkbox-group recommend-situations" id="situationFilter">
+      <label><input type="checkbox" value="출근"> 출근</label>
+      <label><input type="checkbox" value="일상"> 일상</label>
+      <label><input type="checkbox" value="격식"> 격식</label>
+    </div>
     <div id="outfitResult" class="outfit-result">
       <p class="empty-msg">상의·하의·신발을 옷장에 먼저 등록해주세요.</p>
     </div>
     <div class="recommend-actions">
       <button type="button" id="recommendBtn" class="submit-btn">코디 추천받기</button>
       <button type="button" id="saveFavoriteBtn" class="ghost-btn" disabled>이 코디 즐겨찾기</button>
+      <button type="button" id="dislikeOutfitBtn" class="ghost-btn" disabled>이 코디 비추천</button>
     </div>
   </section>
 
@@ -62,27 +69,12 @@
           <label><input type="checkbox" value="겨울"> 겨울</label>
         </div>
 
-        <label>핏</label>
-        <div class="segmented" id="itemFit">
-          <button type="button" class="segmented-btn active" data-value="레귤러">레귤러</button>
-          <button type="button" class="segmented-btn" data-value="세미오버/세미와이드">세미오버/세미와이드</button>
-          <button type="button" class="segmented-btn" data-value="오버/와이드">오버/와이드</button>
+        <label>상황</label>
+        <div class="checkbox-group" id="itemSituations">
+          <label><input type="checkbox" value="출근"> 출근</label>
+          <label><input type="checkbox" value="일상"> 일상</label>
+          <label><input type="checkbox" value="격식"> 격식</label>
         </div>
-
-        <label for="itemGenre">장르</label>
-        <select id="itemGenre">
-          <option value="미니멀">미니멀</option>
-          <option value="캐주얼">캐주얼</option>
-          <option value="아메카지">아메카지</option>
-          <option value="스트리트">스트리트</option>
-          <option value="클래식">클래식</option>
-          <option value="빈티지">빈티지</option>
-          <option value="스포티">스포티</option>
-          <option value="고프코어">고프코어</option>
-        </select>
-
-        <label for="itemMemo">메모</label>
-        <input type="text" id="itemMemo" placeholder="메모 (선택)">
 
         <button type="submit" class="submit-btn">추가하기</button>
       </form>
