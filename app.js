@@ -15,7 +15,8 @@
     favorites: loadJSON(FAVORITES_KEY, []),
     dislikedCombos: loadJSON(DISLIKED_KEY, []),
     currentOutfit: null, // { 상의: item|null, 하의: item|null, ... }
-    selectedSeason: getCurrentSeason()
+    selectedSeason: getCurrentSeason(),
+    editingItemId: null
   };
 
   var els = {
@@ -25,6 +26,8 @@
     itemColor: document.getElementById("itemColor"),
     itemSeasons: document.getElementById("itemSeasons"),
     itemSituations: document.getElementById("itemSituations"),
+    itemSubmitBtn: document.getElementById("itemSubmitBtn"),
+    itemCancelBtn: document.getElementById("itemCancelBtn"),
     closetList: document.getElementById("closetList"),
     seasonFilter: document.getElementById("seasonFilter"),
     situationFilter: document.getElementById("situationFilter"),
@@ -154,10 +157,56 @@
     renderCloset();
   }
 
+  function updateItem(id, changes) {
+    var item = state.items.find(function (it) { return it.id === id; });
+    if (!item) return;
+    Object.assign(item, changes);
+    saveItems();
+    renderCloset();
+    if (state.currentOutfit) renderOutfit();
+  }
+
+  function startEditItem(id) {
+    var item = state.items.find(function (it) { return it.id === id; });
+    if (!item) return;
+
+    state.editingItemId = id;
+    els.itemCategory.value = item.category;
+    els.itemName.value = item.name;
+    els.itemColor.value = item.color || "";
+
+    resetCheckboxes(els.itemSeasons);
+    (item.seasons || []).forEach(function (s) {
+      var box = els.itemSeasons.querySelector('input[value="' + s + '"]');
+      if (box) box.checked = true;
+    });
+
+    resetCheckboxes(els.itemSituations);
+    (item.situations || []).forEach(function (s) {
+      var box = els.itemSituations.querySelector('input[value="' + s + '"]');
+      if (box) box.checked = true;
+    });
+
+    els.itemSubmitBtn.textContent = "수정하기";
+    els.itemCancelBtn.classList.remove("hidden");
+    els.itemName.focus();
+  }
+
+  function cancelEdit() {
+    state.editingItemId = null;
+    els.itemForm.reset();
+    resetCheckboxes(els.itemSeasons);
+    resetCheckboxes(els.itemSituations);
+    els.itemSubmitBtn.textContent = "추가하기";
+    els.itemCancelBtn.classList.add("hidden");
+  }
+
   function deleteItem(id) {
     state.items = state.items.filter(function (it) { return it.id !== id; });
     saveItems();
     renderCloset();
+
+    if (state.editingItemId === id) cancelEdit();
 
     if (state.currentOutfit) {
       var stillValid = CATEGORIES.every(function (cat) {
@@ -215,6 +264,13 @@
           color.textContent = it.color;
           topRow.appendChild(color);
         }
+
+        var edit = document.createElement("button");
+        edit.className = "chip-delete";
+        edit.setAttribute("aria-label", "수정");
+        edit.textContent = "✎";
+        edit.addEventListener("click", function () { startEditItem(it.id); });
+        topRow.appendChild(edit);
 
         var del = document.createElement("button");
         del.className = "chip-delete";
@@ -434,22 +490,30 @@
     var name = els.itemName.value.trim();
     if (!name) return;
 
-    addItem({
-      id: makeId(),
+    var fields = {
       category: els.itemCategory.value,
       name: name,
       color: els.itemColor.value.trim(),
       seasons: getCheckedValues(els.itemSeasons),
-      situations: getCheckedValues(els.itemSituations),
-      createdAt: Date.now()
-    });
+      situations: getCheckedValues(els.itemSituations)
+    };
 
-    els.itemName.value = "";
-    els.itemColor.value = "";
-    resetCheckboxes(els.itemSeasons);
-    resetCheckboxes(els.itemSituations);
-    els.itemName.focus();
+    if (state.editingItemId) {
+      updateItem(state.editingItemId, fields);
+      cancelEdit();
+    } else {
+      fields.id = makeId();
+      fields.createdAt = Date.now();
+      addItem(fields);
+      els.itemName.value = "";
+      els.itemColor.value = "";
+      resetCheckboxes(els.itemSeasons);
+      resetCheckboxes(els.itemSituations);
+      els.itemName.focus();
+    }
   });
+
+  els.itemCancelBtn.addEventListener("click", cancelEdit);
 
   els.seasonFilter.querySelectorAll(".segmented-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {

@@ -235,6 +235,21 @@ body {
   padding: 2px 8px;
 }
 
+.item-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.item-form-actions .submit-btn {
+  margin-top: 0;
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+
 .submit-btn {
   margin-top: 10px;
   padding: 11px;
