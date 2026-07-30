@@ -3,25 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>오늘 뭐 먹지? - 식사 랜덤 뽑기</title>
+<title>오늘 뭐 먹지? · 식사 뽑기판</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
-  <header class="app-header">
+  <header class="stall-sign">
+    <span class="sign-stamp">뽑기</span>
     <h1>오늘 뭐 먹지?</h1>
-    <p class="subtitle">먹고 싶은 종류를 체크하고 뽑기 버튼을 눌러보세요</p>
+    <p class="subtitle">먹고 싶은 종류를 고르고, 뽑기판을 돌려보세요</p>
   </header>
 
-  <section class="panel">
-    <h2>항목 선택</h2>
+  <section class="panel tag-panel">
+    <h2>항목 고르기</h2>
     <div class="checkbox-group category-group" id="categoryList"></div>
   </section>
 
-  <section class="panel roulette-panel">
-    <div class="roulette-box" id="rouletteBox">
-      <span class="roulette-emoji" id="rouletteEmoji">🍽️</span>
-      <span class="roulette-text" id="rouletteText">두근두근</span>
+  <section class="panel crate-panel">
+    <div class="crate" id="rouletteBox">
+      <div class="crate-nail tl"></div>
+      <div class="crate-nail tr"></div>
+      <div class="crate-nail bl"></div>
+      <div class="crate-nail br"></div>
+      <div class="slip">
+        <span class="roulette-emoji" id="rouletteEmoji">🍽️</span>
+        <span class="roulette-text" id="rouletteText">두근두근</span>
+      </div>
+      <div class="stamp-mark" id="stampMark">당첨</div>
     </div>
     <div class="roulette-actions">
       <button type="button" id="spinBtn" class="submit-btn">뽑기</button>
