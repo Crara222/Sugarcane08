@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 코디</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <h1>오늘의 코디</h1>
+  </header>
+
+  <section class="panel recommend-panel">
+    <h2>오늘의 코디 추천</h2>
+    <label class="field-label">계절</label>
+    <div class="segmented" id="seasonFilter">
+      <button type="button" class="segmented-btn" data-value="전체">전체</button>
+      <button type="button" class="segmented-btn" data-value="봄">봄</button>
+      <button type="button" class="segmented-btn" data-value="여름">여름</button>
+      <button type="button" class="segmented-btn" data-value="가을">가을</button>
+      <button type="button" class="segmented-btn" data-value="겨울">겨울</button>
+    </div>
+    <div class="include-toggles">
+      <label><input type="checkbox" id="includeOuter" checked> 아우터 포함</label>
+      <label><input type="checkbox" id="includeAccessory" checked> 액세서리 포함</label>
+    </div>
+    <div id="outfitResult" class="outfit-result">
+      <p class="empty-msg">상의·하의·신발을 옷장에 먼저 등록해주세요.</p>
+    </div>
+    <div class="recommend-actions">
+      <button type="button" id="recommendBtn" class="submit-btn">코디 추천받기</button>
+      <button type="button" id="saveFavoriteBtn" class="ghost-btn" disabled>이 코디 즐겨찾기</button>
+    </div>
+  </section>
+
+  <section class="main-grid">
+    <div class="panel">
+      <h2>옷장에 추가</h2>
+      <form id="itemForm" class="item-form">
+        <label for="itemCategory">종류</label>
+        <select id="itemCategory">
+          <option value="상의">상의</option>
+          <option value="하의">하의</option>
+          <option value="아우터">아우터</option>
+          <option value="신발">신발</option>
+          <option value="액세서리">액세서리</option>
+        </select>
+
+        <label for="itemName">이름</label>
+        <input type="text" id="itemName" placeholder="예: 흰색 셔츠" required>
+
+        <label for="itemColor">색상</label>
+        <input type="text" id="itemColor" placeholder="예: 화이트">
+
+        <label>계절</label>
+        <div class="checkbox-group" id="itemSeasons">
+          <label><input type="checkbox" value="봄"> 봄</label>
+          <label><input type="checkbox" value="여름"> 여름</label>
+          <label><input type="checkbox" value="가을"> 가을</label>
+          <label><input type="checkbox" value="겨울"> 겨울</label>
+        </div>
+
+        <label>핏</label>
+        <div class="segmented" id="itemFit">
+          <button type="button" class="segmented-btn active" data-value="레귤러">레귤러</button>
+          <button type="button" class="segmented-btn" data-value="세미오버/세미와이드">세미오버/세미와이드</button>
+          <button type="button" class="segmented-btn" data-value="오버/와이드">오버/와이드</button>
+        </div>
+
+        <label for="itemGenre">장르</label>
+        <select id="itemGenre">
+          <option value="미니멀">미니멀</option>
+          <option value="캐주얼">캐주얼</option>
+          <option value="아메카지">아메카지</option>
+          <option value="스트리트">스트리트</option>
+          <option value="클래식">클래식</option>
+          <option value="빈티지">빈티지</option>
+          <option value="스포티">스포티</option>
+          <option value="고프코어">고프코어</option>
+        </select>
+
+        <label for="itemMemo">메모</label>
+        <input type="text" id="itemMemo" placeholder="메모 (선택)">
+
+        <button type="submit" class="submit-btn">추가하기</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>내 옷장</h2>
+      <div id="closetList" class="closet-list">
+        <p class="empty-msg" id="closetEmptyMsg">등록된 옷이 없습니다.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>즐겨찾는 코디</h2>
+      <ul id="favoriteList" class="favorite-list">
+        <li class="empty-msg" id="favoriteEmptyMsg">저장된 코디가 없습니다.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
