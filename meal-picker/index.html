@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘 뭐 먹지? - 식사 랜덤 뽑기</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <h1>오늘 뭐 먹지?</h1>
+    <p class="subtitle">먹고 싶은 종류를 체크하고 뽑기 버튼을 눌러보세요</p>
+  </header>
+
+  <section class="panel">
+    <h2>항목 선택</h2>
+    <div class="checkbox-group category-group" id="categoryList"></div>
+  </section>
+
+  <section class="panel roulette-panel">
+    <div class="roulette-box" id="rouletteBox">
+      <span class="roulette-emoji" id="rouletteEmoji">🍽️</span>
+      <span class="roulette-text" id="rouletteText">두근두근</span>
+    </div>
+    <div class="roulette-actions">
+      <button type="button" id="spinBtn" class="submit-btn">뽑기</button>
+      <button type="button" id="resetBtn" class="ghost-btn">초기화</button>
+    </div>
+  </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

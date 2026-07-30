@@ -1,0 +1,191 @@
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #d6558c;
+  --accent-soft: #fbe4ee;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161c;
+    --panel: #1e212a;
+    --text: #eceef2;
+    --muted: #9aa2b1;
+    --border: #2c313d;
+    --accent: #ec7fac;
+    --accent-soft: #3a2430;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Pretendard", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.panel h2 {
+  font-size: 1rem;
+  margin: 0 0 14px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  font-size: 0.88rem;
+}
+
+.category-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.category-group label:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.category-tag-new {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 1px 6px;
+  margin-left: 2px;
+}
+
+.roulette-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.roulette-box {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+
+.roulette-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.roulette-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.roulette-box.spinning .roulette-emoji,
+.roulette-box.spinning .roulette-text {
+  filter: blur(1px);
+  opacity: 0.85;
+}
+
+.roulette-box.landed {
+  animation: landPop 0.45s ease;
+}
+
+@keyframes landPop {
+  0% { transform: scale(0.9); }
+  55% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.roulette-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.roulette-actions .submit-btn,
+.roulette-actions .ghost-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+.submit-btn {
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.submit-btn:hover { opacity: 0.9; }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ghost-btn {
+  padding: 11px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.ghost-btn:hover { background: var(--accent-soft); }
+.ghost-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+}
